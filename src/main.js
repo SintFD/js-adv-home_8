@@ -25,15 +25,25 @@
 
 const baseUrl = "https://jsonplaceholder.typicode.com/";
 
-const users = fetch(baseUrl + "/users").then((res, rej) => {
+const users = fetch(baseUrl + "/users").then((res) => {
   return res.json();
 });
 
-const posts = fetch(baseUrl + "/posts").then((res, rej) => {
+const posts = fetch(baseUrl + "/posts").then((res) => {
   return res.json();
 });
 
-const todos = fetch(baseUrl + "/todoss").then((res) => {
+const todos = fetch(baseUrl + "/todos").then((res) => {
+  if (res.ok) {
+    return res.json();
+  }
+});
+
+const testPromise = new Promise((resolve) =>
+  setTimeout(() => resolve("Медленно, но успешно"), 3000)
+);
+
+const errTodos = fetch(baseUrl + "/todoss").then((res) => {
   if (res.ok) {
     return res.json();
   } else {
@@ -48,10 +58,10 @@ Promise.all([users, posts, todos])
     console.log("Количество задач:", res[2].length);
   })
   .catch((err) => {
-    console.log(err);
+    console.log("ERR!!!!", err);
   });
 
-Promise.allSettled([users, posts, todos])
+Promise.allSettled([users, posts, errTodos])
   .then((res) => {
     console.log(res);
 
@@ -62,3 +72,7 @@ Promise.allSettled([users, posts, todos])
   .catch((err) => {
     console.log(err);
   });
+
+Promise.race([users, testPromise]).then((res) => {
+  console.log(" Users Быстрее !!!", res);
+});
